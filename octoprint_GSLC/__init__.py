@@ -20,7 +20,7 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
 
     def __init__(self):
         self.pigClient = pigpio.pi()
-        self.regM = re.compile('M\d')
+        self.regM = re.compile('M\d+')
         self.regS = re.compile('S\d+')
 
     def hook_gcode_queuing(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
