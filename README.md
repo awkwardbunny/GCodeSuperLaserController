@@ -5,8 +5,8 @@ Printing from the OctoPrint interface with this plugin can turn your 3D printer 
 
 Commands
 --------
-- **M3 \<p\>**:  Turns ON the laser with power \<p\>
-- **M4 \<p\>**:  Turns ON the laser with power 255-\<p\>
+- **M3 S\<p\>**:  Turns ON the laser with power \<p\>
+- **M4 S\<p\>**:  Turns ON the laser with power 255-\<p\>
 - **M5**:  Turn OFF the laser
 
 The laser power can go from 1 (min) to 255 (MAX)
