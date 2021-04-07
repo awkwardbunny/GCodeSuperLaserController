@@ -21,6 +21,13 @@ Step 1) Connect the Laser driver to pins GPIO18 and GND<br/>
 Step 2) Create a GCode using the described commands<br/>
 Step 3) Print **using Octoprint**
 
+**NOTE:** After step 1, you may have to ssh in, install and enable pigpiod, and then restart octoprint:
+```sh
+sudo apt update && sudo apt install pigpiod
+sudo systemctl enable pigpiod
+sudo systemctl start pigpiod
+sudo service octoprint restart
+```
 
 **Have fun :)**<br/>
 Oh, almost forgot, I'm not responsible for you hurting yourself with your cool laser, but please use it with caution.
