@@ -1,8 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import
+
 import octoprint.plugin
 import RPi.GPIO as GPIO
-import logging
 
 INVERT = False
 LASER_GPIO = 18
@@ -15,14 +15,15 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
 
     def __init__(self):
         super().__init__()
-        self.__logger = logging.getLogger(__name__)
         self.output = None
         GPIO.setmode(GPIO.BCM)
 
     def on_startup(self, host, port):
-        self.__logger.info(f"Initializing laser at GPIO {LASER_GPIO}")
-        GPIO.setup(LASER_GPIO, GPIO.OUT)
-        self.output = GPIO.PWM(LASER_GPIO, LASER_PWM_FREQ)
+        gpio = self._settings.get(["gpio"])
+        freq = self._settings.get(["pwmFreq"])
+        self._logger.info(f"Initializing laser at GPIO {gpio}")
+        GPIO.setup(gpio, GPIO.OUT)
+        self.output = GPIO.PWM(gpio, freq)
         self.laser_set(0)
 
     def on_shutdown(self):
@@ -37,6 +38,14 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
             else:
                 self._logger.debug(f"Laser ON ({power}%)")
                 self.output.start(power)
+        else:
+            self._logger.debug(f"Cannot control laser when GPIO is not initialized")
+
+    def get_settings_defaults(self):
+        return {
+            "gpio": LASER_GPIO,
+            "pwmFreq": LASER_PWM_FREQ,
+        }
 
     def hook_gcode_sending(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         parts = cmd.split()
