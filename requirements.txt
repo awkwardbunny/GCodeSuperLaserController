@@ -1,1 +1,1 @@
-pigpio
+RPi.GPIO

@@ -1,72 +1,70 @@
 # coding=utf-8
 from __future__ import absolute_import
 import octoprint.plugin
-import pigpio
-import re
+import RPi.GPIO as GPIO
+import logging
 
 INVERT = False
-DEBUG  = False
-PCIO_ID  = "18"
-PIGS_CMD = "pigs p " + PCIO_ID + " "
+LASER_GPIO = 18
+LASER_PWM_FREQ = 60
 
 
 class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
-                            octoprint.plugin.SettingsPlugin):
+                                octoprint.plugin.ShutdownPlugin,
+                                octoprint.plugin.SettingsPlugin):
 
     def __init__(self):
-        self.pigClient = pigpio.pi()
-        self.regM = re.compile('M\d+')
-        self.regS = re.compile('S\d+')
+        super().__init__()
+        self.__logger = logging.getLogger(__name__)
+        self.output = None
+        GPIO.setmode(GPIO.BCM)
+
+    def on_startup(self, host, port):
+        self.__logger.info(f"Initializing laser at GPIO {LASER_GPIO}")
+        GPIO.setup(LASER_GPIO, GPIO.OUT)
+        self.output = GPIO.PWM(LASER_GPIO, LASER_PWM_FREQ)
+        self.laser_set(0)
+
+    def on_shutdown(self):
+        self.output.stop()
+        GPIO.cleanup()
+
+    def laser_set(self, power):
+        if self.output:
+            if power == 0:
+                self._logger.debug(f"Laser OFF")
+                self.output.stop()
+            else:
+                self._logger.debug(f"Laser ON ({power}%)")
+                self.output.start(power)
 
     def hook_gcode_sending(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-        commandNumbers = self.regM.findall(cmd)
+        parts = cmd.split()
+        if gcode in ["M3", "M4"] and len(parts) > 1:
 
-        if len(commandNumbers) > 0:
-            commandNumber = commandNumbers[0]
-        # ------------------------------------------------------
+            # Strip leading "S" if present
+            power_str = parts[1]
+            if power_str.startswith("S"):
+                power_str = power_str[1:]
 
-            if commandNumber == "M3":
-                commandValue = self.regS.findall(cmd)[0]
-                finalValue = int(commandValue[1:])
+            # Convert to int and check limits
+            power_int = int(power_str)
+            power_int = min(power_int, 255)
+            power_int = max(power_int, 0)
 
-                if INVERT:
-                    finalValue = 255 - int(commandValue[1:])
+            # Convert to percent
+            # RPi.GPIO takes 0.0-100.0 instead of 0-255
+            power_percent = power_int * 100 / 255
 
-                self.pigClient.set_PWM_dutycycle(18, finalValue)
+            if (gcode == "M4") ^ INVERT:
+                power_percent = 100.0 - power_percent
 
-                if DEBUG:
-                    myCmd = PIGS_CMD + str(finalValue)
-                    print(myCmd)
+            self.laser_set(power_percent)
+            return None,  # No need to send command to printer
 
-        # ------------------------------------------------------
-
-            if commandNumber == "M4":
-                commandValue = self.regS.findall(cmd)[0]
-                finalValue = 255 - int(commandValue[1:])
-
-                if INVERT:
-                    finalValue = int(commandValue[1:])
-
-                self.pigClient.set_PWM_dutycycle(18, finalValue)
-
-                if DEBUG:
-                    myCmd = PIGS_CMD + str(finalValue)
-                    print(myCmd)
-
-        # ------------------------------------------------------
-
-            if commandNumber == "M5":
-                finalValue = 0
-                if INVERT:
-                    finalValue = 255
-
-                self.pigClient.set_PWM_dutycycle(18, finalValue)
-
-                if DEBUG:
-                    myCmd = PIGS_CMD + str(finalValue)
-                    print(myCmd)
-
-        # ------------------------------------------------------
+        if gcode == "M5":
+            self.laser_set(0)
+            return None,  # No need to send command to printer
 
     def get_update_information(self):
         return dict(
@@ -83,8 +81,10 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
             )
         )
 
+
 __plugin_name__ = "GCodeSuperLaserController"
 __plugin_pythoncompat__ = ">=2.7,<4"
+
 
 def __plugin_load__():
     global __plugin_implementation__
