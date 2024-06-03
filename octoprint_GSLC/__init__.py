@@ -2,9 +2,6 @@
 from __future__ import absolute_import
 import octoprint.plugin
 import pigpio
-import time
-import os
-import sys
 import re
 
 INVERT = False
@@ -14,8 +11,6 @@ PIGS_CMD = "pigs p " + PCIO_ID + " "
 
 
 class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
-                            octoprint.plugin.TemplatePlugin,
-                            octoprint.plugin.AssetPlugin,
                             octoprint.plugin.SettingsPlugin):
 
     def __init__(self):
@@ -23,7 +18,7 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
         self.regM = re.compile('M\d+')
         self.regS = re.compile('S\d+')
 
-    def hook_gcode_queuing(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+    def hook_gcode_sending(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         commandNumbers = self.regM.findall(cmd)
 
         if len(commandNumbers) > 0:
@@ -97,5 +92,5 @@ def __plugin_load__():
 
     global __plugin_hooks__
     __plugin_hooks__ = {
-        "octoprint.comm.protocol.gcode.queuing": __plugin_implementation__.hook_gcode_queuing,
+        "octoprint.comm.protocol.gcode.sending": __plugin_implementation__.hook_gcode_sending,
     }
