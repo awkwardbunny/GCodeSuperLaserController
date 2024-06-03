@@ -41,7 +41,7 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
 
                 if DEBUG:
                     myCmd = PIGS_CMD + str(finalValue)
-                    print myCmd
+                    print(myCmd)
 
         # ------------------------------------------------------
 
@@ -56,7 +56,7 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
 
                 if DEBUG:
                     myCmd = PIGS_CMD + str(finalValue)
-                    print myCmd
+                    print(myCmd)
 
         # ------------------------------------------------------
 
@@ -69,7 +69,7 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
 
                 if DEBUG:
                     myCmd = PIGS_CMD + str(finalValue)
-                    print myCmd
+                    print(myCmd)
 
         # ------------------------------------------------------
 
@@ -89,6 +89,7 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "GCodeSuperLaserController"
+__plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
     global __plugin_implementation__
