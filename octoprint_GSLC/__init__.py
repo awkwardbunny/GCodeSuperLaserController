@@ -81,10 +81,10 @@ class GCodeSuperLaserController(octoprint.plugin.StartupPlugin,
 
                 type="github_release",
                 current=self._plugin_version,
-                user="Skiepp",
+                user="Brian",
                 repo="GCodeSuperLaserController",
 
-                pip="https://github.com/Skiepp/GCodeSuperLaserController/archive/{target_version}.zip"
+                pip="https://github.com/awkwardbunny/GCodeSuperLaserController/archive/{target_version}.zip"
             )
         )
 
