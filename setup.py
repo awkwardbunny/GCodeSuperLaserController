@@ -14,20 +14,20 @@ plugin_package = "octoprint_%s" % plugin_identifier
 plugin_name = "GCodeSuperLaserController"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "1.1"
+plugin_version = "1.2"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
 plugin_description = "Actions to work with a Laser engraver"
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
-plugin_author = "Skiepp"
+plugin_author = "Brian"
 
 # The plugin's author's mail address.
-plugin_author_email = "skiepp93@hotmail.it"
+plugin_author_email = "brian@hongs.me"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/Skiepp/GCodeSuperLaserController"
+plugin_url = "https://github.com/awkwardbunny/GCodeSuperLaserController"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "Apache License 2.0"
